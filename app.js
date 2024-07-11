@@ -1,6 +1,7 @@
 const express=require("express");
 const bodyParser=require("body-parser");
 const mongoose = require("mongoose");
+const { name } = require("ejs");
 const date=require(__dirname+"/date.js");
 
 const app=express();
@@ -56,6 +57,38 @@ item.find({})
     })
 });
 
+const listSchema={
+    name:String,
+    items:[itemSchema]
+}
+
+const List= mongoose.model("List",listSchema);
+
+app.get("/:customListName",function(req,res){
+    const customListName = req.params.customListName;
+    
+
+    List.findOne({name:customListName})
+    .then(function(foundList,err){
+        if(!err){
+            if(!foundList){
+                const list = new List({
+                    name:customListName,
+                    items:defaultItems
+                });
+                list.save();
+                res.redirect("/"+customListName);
+            }
+            
+            else{
+                res.render("list", { listTitle: foundList.name, newItems: foundList.items });
+            }
+        }
+    })
+
+    
+});
+
 
 app.post("/",function(req,res){
     const newItem=req.body.newItem;
@@ -80,9 +113,6 @@ app.post("/delete",function(req,res){
     });
 });
 
-app.get("/work",function(req,res){
-    res.render("list",{listTitle:"Work List",newItems:workItems});
-});
 
 app.listen(3000,function(){
     console.log("Server started on port 3000");
