@@ -58,17 +58,14 @@ item.find({})
 
 
 app.post("/",function(req,res){
-    var newItem=req.body.newItem;
+    const newItem=req.body.newItem;
+    const item4 = new item({
+        name:newItem
+    });
 
-    if(req.body.list==="Work"){
-        workItems.push(newItem);
-        res.redirect("/work");
-    }
-
-    else{
-    items.push(newItem);
+    item4.save();
     res.redirect("/")
-    }
+
 });
 
 app.get("/work",function(req,res){
